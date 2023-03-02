@@ -1,6 +1,7 @@
 package resolvers
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/miekg/dns"
@@ -22,6 +23,7 @@ type Options struct {
 	Strategy           string
 	InsecureSkipVerify bool
 	TLSHostname        string
+	Headers            http.Header
 }
 
 // Resolver implements the configuration for a DNS

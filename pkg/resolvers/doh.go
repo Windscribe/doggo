@@ -70,8 +70,19 @@ func (r *DOHResolver) Lookup(question dns.Question) (Response, error) {
 			return rsp, err
 		}
 		now := time.Now()
+
 		// Make an HTTP POST request to the DNS server with the DNS message as wire format bytes in the body.
-		resp, err := r.client.Post(r.server, "application/dns-message", bytes.NewBuffer(b))
+		req, err := http.NewRequest("POST", r.server, bytes.NewBuffer(b))
+		if err != nil {
+			return rsp, err
+		}
+		if len(r.resolverOptions.Headers) > 0 {
+			req.Header = r.resolverOptions.Headers
+		}
+		req.Header.Set("Content-Type", "application/dns-message")
+
+		resp, err := r.client.Do(req)
+
 		if err != nil {
 			return rsp, err
 		}

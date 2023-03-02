@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/knadh/koanf"
@@ -20,7 +22,23 @@ var (
 	buildDate    = "unknown"
 	logger       = utils.InitLogger()
 	k            = koanf.New(".")
+	headerFlags  arrayFlags
 )
+
+type arrayFlags []string
+
+func (i *arrayFlags) Type() string {
+	return "slice"
+}
+
+func (i *arrayFlags) String() string {
+	return ""
+}
+
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
 
 func main() {
 	// Initialize app.
@@ -48,6 +66,7 @@ func main() {
 	f.String("strategy", "all", "Strategy to query nameservers in resolv.conf file (`all`, `random`, `first`)")
 	f.String("tls-hostname", "", "Provide a hostname for doing verification of the certificate if the provided DoT nameserver is an IP")
 	f.Bool("skip-hostname-verification", false, "Skip TLS Hostname Verification")
+	f.Var(&headerFlags, "header", "Headers to supply to DoH resolvers")
 
 	// Output Options
 	f.BoolP("json", "J", false, "Set the output format as JSON")
@@ -121,6 +140,17 @@ func main() {
 		app.Logger.Exit(2)
 	}
 
+	// load doh headers
+	resolverHeaders := http.Header{}
+	if len(headerFlags) > 0 {
+		for _, header := range headerFlags {
+			parts := strings.Split(header, ":")
+			if len(parts) == 2 {
+				resolverHeaders.Add(parts[0], strings.TrimSpace(parts[1]))
+			}
+		}
+	}
+
 	// Load Resolvers.
 	rslvrs, err := resolvers.LoadResolvers(resolvers.Options{
 		Nameservers:        app.Nameservers,
@@ -133,6 +163,7 @@ func main() {
 		Strategy:           app.QueryFlags.Strategy,
 		InsecureSkipVerify: app.QueryFlags.InsecureSkipVerify,
 		TLSHostname:        app.QueryFlags.TLSHostname,
+		Headers:            resolverHeaders,
 	})
 	if err != nil {
 		app.Logger.WithError(err).Error("error loading resolver")
