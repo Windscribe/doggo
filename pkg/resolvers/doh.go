@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lucas-clemente/quic-go/http3"
 	"github.com/miekg/dns"
+	"github.com/quic-go/quic-go/http3"
 	"github.com/sirupsen/logrus"
 )
 
