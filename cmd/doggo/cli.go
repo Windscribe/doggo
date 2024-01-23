@@ -144,9 +144,9 @@ func main() {
 	resolverHeaders := http.Header{}
 	if len(headerFlags) > 0 {
 		for _, header := range headerFlags {
-			parts := strings.Split(header, ":")
-			if len(parts) == 2 {
-				resolverHeaders.Add(parts[0], strings.TrimSpace(parts[1]))
+			header, value, _ := strings.Cut(header, ":")
+			if len(value) > 0 {
+				resolverHeaders.Add(header, strings.TrimSpace(value))
 			}
 		}
 	}
