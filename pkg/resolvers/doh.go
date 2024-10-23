@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
@@ -10,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lucas-clemente/quic-go/http3"
 	"github.com/miekg/dns"
+	"github.com/quic-go/quic-go/http3"
 	"github.com/sirupsen/logrus"
 )
 
@@ -37,10 +38,19 @@ func NewDOHResolver(server string, resolverOpts Options, doh3 bool) (Resolver, e
 	}
 	httpClient := &http.Client{
 		Timeout: resolverOpts.Timeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: resolverOpts.InsecureSkipVerify,
+			},
+		},
 	}
 
 	if doh3 {
-		httpClient.Transport = &http3.RoundTripper{}
+		httpClient.Transport = &http3.RoundTripper{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: resolverOpts.InsecureSkipVerify,
+			},
+		}
 	}
 
 	return &DOHResolver{

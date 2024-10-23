@@ -11,8 +11,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/lucas-clemente/quic-go"
 	"github.com/miekg/dns"
+	"github.com/quic-go/quic-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -42,7 +42,7 @@ func (r *DOQResolver) Lookup(question dns.Question) (Response, error) {
 		messages = prepareMessages(question, r.resolverOptions.Ndots, r.resolverOptions.SearchList)
 	)
 
-	session, err := quic.DialAddr(r.server, r.tls, nil)
+	session, err := quic.DialAddr(context.Background(), r.server, r.tls, nil)
 	if err != nil {
 		return rsp, err
 	}
@@ -154,7 +154,7 @@ func (r *DOQResolver) Lookup1(question dns.Question) ([]dns.Msg, error) {
 	}
 	defer udpConn.Close()
 
-	session, err := quic.Dial(udpConn, udpAddr, r.server, r.tls, nil)
+	session, err := quic.Dial(context.Background(), udpConn, udpAddr, r.tls, nil)
 	if err != nil {
 		return nil, err
 	}
