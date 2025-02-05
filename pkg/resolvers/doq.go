@@ -28,6 +28,7 @@ func NewDOQResolver(server string, resolverOpts Options) (Resolver, error) {
 	return &DOQResolver{
 		tls: &tls.Config{
 			NextProtos: []string{"doq"},
+			RootCAs:    resolverOpts.RootCAs,
 		},
 		server:          server,
 		resolverOptions: resolverOpts,
