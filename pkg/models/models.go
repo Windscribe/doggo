@@ -40,6 +40,7 @@ type QueryFlags struct {
 	Strategy           string        `koanf:"strategy" strategy:"-"`
 	InsecureSkipVerify bool          `koanf:"skip-hostname-verification" skip-hostname-verification:"-"`
 	TLSHostname        string        `koanf:"tls-hostname" tls-hostname:"-"`
+	RootCAs            string        `koanf:"root-cas"`
 }
 
 // Nameserver represents the type of Nameserver

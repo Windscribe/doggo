@@ -41,6 +41,7 @@ func NewDOHResolver(server string, resolverOpts Options, doh3 bool) (Resolver, e
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: resolverOpts.InsecureSkipVerify,
+				RootCAs:            resolverOpts.RootCAs,
 			},
 		},
 	}
@@ -49,6 +50,7 @@ func NewDOHResolver(server string, resolverOpts Options, doh3 bool) (Resolver, e
 		httpClient.Transport = &http3.RoundTripper{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: resolverOpts.InsecureSkipVerify,
+				RootCAs:            resolverOpts.RootCAs,
 			},
 		}
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/x509"
 	"fmt"
 	"net/http"
 	"os"
@@ -67,6 +68,7 @@ func main() {
 	f.String("tls-hostname", "", "Provide a hostname for doing verification of the certificate if the provided DoT nameserver is an IP")
 	f.Bool("skip-hostname-verification", false, "Skip TLS Hostname Verification")
 	f.Var(&headerFlags, "header", "Headers to supply to DoH resolvers")
+	f.String("root-cas", "", "Root CAs file to use for TLS verification")
 
 	// Output Options
 	f.BoolP("json", "J", false, "Set the output format as JSON")
@@ -118,6 +120,8 @@ func main() {
 	app.QueryFlags.QClasses = append(app.QueryFlags.QClasses, qc...)
 	app.QueryFlags.QNames = append(app.QueryFlags.QNames, qn...)
 
+	app.Logger.WithField("query_flags", fmt.Sprintf("%+v", app.QueryFlags)).Debug("Loaded config")
+
 	// Check if reverse flag is passed. If it is, then set
 	// query type as PTR and query class as IN.
 	// Modify query name like 94.2.0.192.in-addr.arpa if it's an IPv4 address.
@@ -151,6 +155,24 @@ func main() {
 		}
 	}
 
+	var certPool *x509.CertPool
+
+	if app.QueryFlags.RootCAs != "" {
+		certPool = x509.NewCertPool()
+
+		rootCAs, err := os.ReadFile(app.QueryFlags.RootCAs)
+		if err != nil {
+			app.Logger.WithError(err).Error("error reading root CAs")
+			app.Logger.Exit(2)
+		}
+
+		ok := certPool.AppendCertsFromPEM(rootCAs)
+		if !ok {
+			app.Logger.Error("error loading root CAs")
+			app.Logger.Exit(2)
+		}
+	}
+
 	// Load Resolvers.
 	rslvrs, err := resolvers.LoadResolvers(resolvers.Options{
 		Nameservers:        app.Nameservers,
@@ -164,6 +186,7 @@ func main() {
 		InsecureSkipVerify: app.QueryFlags.InsecureSkipVerify,
 		TLSHostname:        app.QueryFlags.TLSHostname,
 		Headers:            resolverHeaders,
+		RootCAs:            certPool,
 	})
 	if err != nil {
 		app.Logger.WithError(err).Error("error loading resolver")

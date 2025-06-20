@@ -46,6 +46,7 @@ func NewClassicResolver(server string, classicOpts ClassicResolverOpts, resolver
 		client.TLSConfig = &tls.Config{
 			ServerName:         resolverOpts.TLSHostname,
 			InsecureSkipVerify: resolverOpts.InsecureSkipVerify,
+			RootCAs:            resolverOpts.RootCAs,
 		}
 	}
 

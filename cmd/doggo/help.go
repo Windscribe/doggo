@@ -57,6 +57,7 @@ var appHelpTextTemplate = `{{ "NAME" | color "" "heading" }}:
   {{"--tls-hostname=HOSTNAME" | color "yellow" ""}}      Provide a hostname for doing verification of the certificate if the provided DoT nameserver is an IP.
   {{"--skip-hostname-verification" | color "yellow" ""}} Skip TLS Hostname Verification in case of DOT Lookups.
   {{"--header" | color "yellow" ""}}                     HTTP headers to supply to the resolver. Can supply multiple times.
+  {{"--root-cas=FILE" | color "yellow" ""}}              Root CAs file to use for TLS verification.
 
 {{ "Output Options" | color "" "heading" }}:
   {{"-J, --json " | color "yellow" ""}}                 Format the output as JSON.
