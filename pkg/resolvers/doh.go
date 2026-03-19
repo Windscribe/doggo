@@ -47,7 +47,7 @@ func NewDOHResolver(server string, resolverOpts Options, doh3 bool) (Resolver, e
 	}
 
 	if doh3 {
-		httpClient.Transport = &http3.RoundTripper{
+		httpClient.Transport = &http3.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: resolverOpts.InsecureSkipVerify,
 				RootCAs:            resolverOpts.RootCAs,

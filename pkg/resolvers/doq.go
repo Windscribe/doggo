@@ -67,7 +67,7 @@ func (r *DOQResolver) Lookup(question dns.Question) (Response, error) {
 		}
 		now := time.Now()
 
-		var stream quic.Stream
+		var stream *quic.Stream
 		stream, err = session.OpenStream()
 		if err != nil {
 			return rsp, err
@@ -172,7 +172,7 @@ func (r *DOQResolver) Lookup1(question dns.Question) ([]dns.Msg, error) {
 			return nil, err
 		}
 
-		var stream quic.Stream
+		var stream *quic.Stream
 		stream, err = session.OpenStreamSync(context.Background())
 		if err != nil {
 			return nil, err
